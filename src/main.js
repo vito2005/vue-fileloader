@@ -5,12 +5,6 @@ import store from './store'
 
 Vue.config.productionTip = false
 
-window._fetch = window.fetch
-window.fetch = async (...args) => {
-  const res = await window._fetch(...args)
-  return res
-}
-
 new Vue({
   router,
   store,

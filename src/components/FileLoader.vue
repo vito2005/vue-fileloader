@@ -9,6 +9,7 @@
         {{file && file.name}}
       </div>
       <button class="file-loader__button" type="submit">Отправить</button>
+      <ProgressBar :percent="uploadPercentage"/>
     </form>
   </div>
 </template>
@@ -16,9 +17,13 @@
 <script>
 
 import { mapMutations, mapGetters, mapActions } from 'vuex'
+import ProgressBar from '@/components/ProgressBar'
 export default {
+  components: {
+    ProgressBar
+  },
   computed: {
-    ...mapGetters('fileLoader', ['file'])
+    ...mapGetters('fileLoader', ['file', 'uploadPercentage'])
   },
   methods: {
     ...mapMutations('fileLoader', ['SET_FILE']),
@@ -28,6 +33,7 @@ export default {
     },
     handleFileUpload (e) {
       const file = e.target.files[0]
+      file.id = +new Date()
       this.SET_FILE(file)
     }
   }
