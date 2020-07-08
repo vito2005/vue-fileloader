@@ -43,7 +43,7 @@ export default {
             return 'Успешно'
           case 'canceled':
             return 'Отменено'
-          case 'abort':
+          case 'error':
             return 'Ошибка'
           default:
             return 'Успех'

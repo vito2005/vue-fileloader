@@ -10,9 +10,10 @@ export const upload = async (url, options) => {
     try {
       const xhr = new XMLHttpRequest()
       xhr.upload.addEventListener('progress', (event) => (progressCache[currentChunk.id] = event.loaded))
-      // xhr.addEventListener('error', progressListener)
-      // xhr.addEventListener('abort', progressListener)
       xhr.addEventListener('loadend', (event) => {
+        if (xhr.status !== 200) {
+          reject(new Error('error'))
+        }
         uploadedSize += progressCache[currentChunk.id] || 0
         delete progressCache[currentChunk.id]
         resolve(uploadedSize)
@@ -25,20 +26,12 @@ export const upload = async (url, options) => {
       xhr.setRequestHeader('X-Content-Name', encodeURIComponent(file.name))
       xhr.onreadystatechange = (event) => {
         if (xhr.status !== 200) {
-          reject(xhr.statusText)
+          reject(new Error('error'))
         }
-      }
-      xhr.onerror = (error) => {
-        console.log('Upload error: ', error)
-        reject(error)
-      }
-      xhr.onabort = () => {
-        console.log('Upload canceled by user')
-        reject(new Error('Upload canceled by user'))
       }
       xhr.send(currentChunk.value)
     } catch (e) {
-      reject(e)
+      reject(new Error('error'))
     }
   })
 }

@@ -49,7 +49,7 @@ export default {
             return 'Загрузка произошла успешно'
           case 'canceled':
             return ' Загрузка отменена'
-          case 'abort':
+          case 'error':
             return 'Загрузка завершилась с ошибкой'
           default:
             return 'Загрузка произошла успешно'

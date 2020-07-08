@@ -60,8 +60,8 @@ export default (upload, resetCache) => ({
       try {
         await dispatch('sendChunk', { url: '/api/upload' })
         commit('SET_LAST_SESSION_STATUS', 'success')
-      } catch (error) {
-        if (error.message === 'Failed to upload') {
+      } catch (e) {
+        if (e.message === 'error') {
           commit('SET_LAST_SESSION_STATUS', 'error')
         }
       }
@@ -98,6 +98,9 @@ export default (upload, resetCache) => ({
         }
         await dispatch('sendChunk', { url })
       } catch (e) {
+        if (e.message === 'error') {
+          throw new Error('error')
+        }
         if (e.message === 'canceled') {
           throw new Error('canceled')
         }
