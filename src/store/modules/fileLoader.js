@@ -1,4 +1,4 @@
-export default (upload) => ({
+export default (upload, resetCache) => ({
   namespaced: true,
   state: {
     file: null,
@@ -6,7 +6,7 @@ export default (upload) => ({
     chunkSize: 1048576,
     chunksQueue: null,
     currentChunk: null,
-    uploadedChunks: null,
+    uploadedChunks: 0,
     uploading: null,
     lastSessionStatus: null
   },
@@ -14,16 +14,16 @@ export default (upload) => ({
     file: ({ file }) => file,
     uploading: ({ uploading }) => uploading,
     lastSessionStatus: ({ lastSessionStatus }) => lastSessionStatus,
-    uploadPercentage: ({ uploadedChunks, file }) => file && Math.round(Math.min(uploadedChunks, file.size) / file.size * 100),
+    uploadPercentage: ({ uploadedChunks, file }, { chunksQuantity }) => file && Math.round(uploadedChunks / chunksQuantity * 100),
     chunksQuantity: ({ file, chunkSize }) => file && Math.ceil(file.size / chunkSize),
-    session: ({ file, uploadedChunks }, { chunksQuantity }) => file && ({
+    session: ({ file, uploadedChunks }, { chunksQuantity }) => ({
       id: file.id,
       fileName: file.name,
       size: file.size,
       byteSize: file.size,
       uploadedChunks: uploadedChunks,
       chunks: chunksQuantity
-    })
+    }) || {}
   },
   mutations: {
     ADD_TO_CHUNKSQUEUE (state, chunkId) {
@@ -48,41 +48,49 @@ export default (upload) => ({
       state.chunksQueue = payload
     },
     SET_UPLOADED_CHUNKS (state, loaded) {
-      state.uploadedChunks = Math.min(loaded, state.file.size)
+      state.uploadedChunks = Math.ceil(Math.min(loaded, state.file.size) / state.chunkSize)
     }
   },
   actions: {
     async sendFile ({ state, commit, getters, dispatch }) {
       const { chunksQuantity } = getters
       commit('TOGGLE_UPLOADING', true)
+      commit('SET_LAST_SESSION_STATUS', null)
       commit('SET_CHUNKS_QUEUE', [...Array(chunksQuantity).keys()].reverse())
       try {
         await dispatch('sendChunk', { url: '/api/upload' })
+        commit('SET_LAST_SESSION_STATUS', 'success')
       } catch (error) {
-        console.log(error.message)
         if (error.message === 'Failed to upload') {
-          // dispatch('notification/callError', { group: 'app', errorText: 'Не удалось загрузить файл' }, { root: true })
+          commit('SET_LAST_SESSION_STATUS', 'error')
         }
       }
       const record = {
         id: state.file.id,
-        status: 'success',
+        status: state.lastSessionStatus,
         fileName: state.file.name,
         size: state.file.size,
         byteSize: state.file.size,
-        uploadedChunks: chunksQuantity,
+        uploadedChunks: state.uploadedChunks,
         chunks: chunksQuantity
       }
       commit('statistics/ADD_RECORD', record, { root: true })
-      commit('SET_FILE', null)
-      commit('SET_LAST_SESSION_STATUS', record.status)
-      setTimeout(() => commit('TOGGLE_UPLOADING', false), 500)
+      setTimeout(() => {
+        commit('TOGGLE_UPLOADING', false)
+        commit('SET_UPLOADED_CHUNKS', 0)
+        commit('SET_FILE', null)
+        commit('SET_CHUNKS_QUEUE', null)
+      }, 500)
+      resetCache()
     },
     async sendChunk ({ state, getters, dispatch, commit }, { url }) {
       const { file } = state
       const { chunksQuantity } = getters
       commit('SET_CURRENT_CHUNK')
       try {
+        if (state.lastSessionStatus === 'canceled') {
+          throw new Error('canceled')
+        }
         const result = await upload(url, { currentChunk: state.currentChunk, file, chunksQuantity })
         commit('SET_UPLOADED_CHUNKS', result)
         if (!state.chunksQueue.length) {
@@ -90,6 +98,9 @@ export default (upload) => ({
         }
         await dispatch('sendChunk', { url })
       } catch (e) {
+        if (e.message === 'canceled') {
+          throw new Error('canceled')
+        }
         commit('ADD_TO_CHUNKSQUEUE', state.currentChunk.id)
       }
     }

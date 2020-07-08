@@ -26,7 +26,7 @@
         <div class="grid__row">{{session.uploadedChunks}}</div>
         <div class="grid__row">{{session.chunks}}</div>
     </div>
-    <button class="button button_danger" @click="CANCEL_SESSION(r.id)">Отмена</button>
+    <button class="button button_danger" @click="SET_LAST_SESSION_STATUS('canceled')">Отмена</button>
     <ProgressBar :percent="uploadPercentage"/>
     </div>
   </div>

@@ -1,6 +1,10 @@
-const progressCache = {}
+let progressCache = {}
 let uploadedSize = 0
-export default async (url, options) => {
+export const resetCache = () => {
+  uploadedSize = 0
+  progressCache = {}
+}
+export const upload = async (url, options) => {
   const { file, currentChunk, chunksQuantity } = options
   return new Promise(function (resolve, reject) {
     try {

@@ -59,8 +59,8 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #fdb5ca;
-    font-size: 0.9rem;
+    color: rgb(160, 152, 152);
+    font-size: 1rem;
   }
   &__progress-wrapper {
     margin: 0 auto;
@@ -73,8 +73,8 @@ export default {
   }
    &__progress {
     width: 0;
-    height: 18px;
-    background: #f60d54;
+    height: 20px;
+    background: #47f05e75;
     border-radius: 13px;
     }
 }
