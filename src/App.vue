@@ -30,7 +30,6 @@
 }
 .button {
     cursor: pointer;
-    color: #fff;
     line-height: 1;
     cursor: pointer;
     border: 1px solid #dcdfe6;
@@ -42,6 +41,7 @@
     font-size: 14px;
     border-radius: 4px;
     &_danger {
+      color: #fff;
       background-color: #f56c6c;
       border-color: #f56c6c;
       &:hover {
@@ -54,4 +54,21 @@
       }
     }
   }
-</style>
+.grid {
+    display: grid;
+    .grid__header {
+      padding: 15px 5px;
+      margin: 10px 0;
+      border-bottom: 2px solid black;
+      border-top: 2px solid black;
+
+    }
+    .grid__row {
+      padding: 10px 0;
+      border-bottom: 1px solid black;
+      align-self: center;
+      min-height: 30px;
+      position: relative;
+    }
+ }
+ </style>

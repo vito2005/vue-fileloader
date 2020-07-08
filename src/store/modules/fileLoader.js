@@ -5,12 +5,25 @@ export default (upload) => ({
     uploadPercentage: 0,
     chunkSize: 1048576,
     chunksQueue: null,
-    currentChunk: null
+    currentChunk: null,
+    uploadedChunks: null,
+    uploading: null,
+    lastSessionStatus: null
   },
   getters: {
     file: ({ file }) => file,
-    uploadPercentage: ({ uploadPercentage }) => uploadPercentage,
-    chunksQuantity: ({ file, chunkSize }) => Math.ceil(file.size / chunkSize)
+    uploading: ({ uploading }) => uploading,
+    lastSessionStatus: ({ lastSessionStatus }) => lastSessionStatus,
+    uploadPercentage: ({ uploadedChunks, file }) => file && Math.round(Math.min(uploadedChunks, file.size) / file.size * 100),
+    chunksQuantity: ({ file, chunkSize }) => file && Math.ceil(file.size / chunkSize),
+    session: ({ file, uploadedChunks }, { chunksQuantity }) => file && ({
+      id: file.id,
+      fileName: file.name,
+      size: file.size,
+      byteSize: file.size,
+      uploadedChunks: uploadedChunks,
+      chunks: chunksQuantity
+    })
   },
   mutations: {
     ADD_TO_CHUNKSQUEUE (state, chunkId) {
@@ -25,16 +38,23 @@ export default (upload) => ({
     SET_FILE (state, payload) {
       state.file = payload
     },
+    TOGGLE_UPLOADING (state, payload) {
+      state.uploading = payload
+    },
+    SET_LAST_SESSION_STATUS (state, payload) {
+      state.lastSessionStatus = payload
+    },
     SET_CHUNKS_QUEUE (state, payload) {
       state.chunksQueue = payload
     },
-    SET_UPLOAD_PERCENTAGE (state, loaded) {
-      state.uploadPercentage = Math.round(Math.min(loaded, state.file.size) / state.file.size * 100)
+    SET_UPLOADED_CHUNKS (state, loaded) {
+      state.uploadedChunks = Math.min(loaded, state.file.size)
     }
   },
   actions: {
     async sendFile ({ state, commit, getters, dispatch }) {
       const { chunksQuantity } = getters
+      commit('TOGGLE_UPLOADING', true)
       commit('SET_CHUNKS_QUEUE', [...Array(chunksQuantity).keys()].reverse())
       try {
         await dispatch('sendChunk', { url: '/api/upload' })
@@ -55,6 +75,8 @@ export default (upload) => ({
       }
       commit('statistics/ADD_RECORD', record, { root: true })
       commit('SET_FILE', null)
+      commit('SET_LAST_SESSION_STATUS', record.status)
+      setTimeout(() => commit('TOGGLE_UPLOADING', false), 500)
     },
     async sendChunk ({ state, getters, dispatch, commit }, { url }) {
       const { file } = state
@@ -62,7 +84,7 @@ export default (upload) => ({
       commit('SET_CURRENT_CHUNK')
       try {
         const result = await upload(url, { currentChunk: state.currentChunk, file, chunksQuantity })
-        commit('SET_UPLOAD_PERCENTAGE', result)
+        commit('SET_UPLOADED_CHUNKS', result)
         if (!state.chunksQueue.length) {
           return Promise.resolve()
         }
