@@ -44,6 +44,16 @@ export default (upload) => ({
           // dispatch('notification/callError', { group: 'app', errorText: 'Не удалось загрузить файл' }, { root: true })
         }
       }
+      const record = {
+        id: state.file.id,
+        status: 'success',
+        fileName: state.file.name,
+        size: state.file.size,
+        byteSize: state.file.size,
+        uploadedChunks: chunksQuantity,
+        chunks: chunksQuantity
+      }
+      commit('statistics/ADD_RECORD', record, { root: true })
       commit('SET_FILE', null)
     },
     async sendChunk ({ state, getters, dispatch, commit }, { url }) {

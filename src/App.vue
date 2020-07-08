@@ -16,7 +16,6 @@
   text-align: center;
   color: #2c3e50;
 }
-
 #nav {
   padding: 30px;
 
@@ -29,4 +28,30 @@
     }
   }
 }
+.button {
+    cursor: pointer;
+    color: #fff;
+    line-height: 1;
+    cursor: pointer;
+    border: 1px solid #dcdfe6;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    &_danger {
+      background-color: #f56c6c;
+      border-color: #f56c6c;
+      &:hover {
+        background: #f78989;
+        border-color: #f78989;
+      }
+      &:active {
+        background: #dd6161;
+        border-color: #dd6161;
+      }
+    }
+  }
 </style>
