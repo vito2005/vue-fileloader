@@ -57,5 +57,8 @@ const app = express()
 
 // app.use(express.static(path.join(__dirname, '/dist/')))
 // app.get('/.*/', (req, res) => res.sendFile(path.join(__dirname, '/dist/index.html')))
+app.get('/.*/', (req, res) => res.end('hello'))
 
-app.listen(3000)
+app.listen(5000, () => {
+  console.log('server has been started')
+})
