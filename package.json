@@ -7,7 +7,7 @@
   },
   "main": "server.js",
   "scripts": {
-    "start": "node server"
+    "start": "node --harmony server"
   },
   "dependencies": {
     "core-js": "^3.6.5",
