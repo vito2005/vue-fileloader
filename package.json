@@ -6,8 +6,8 @@
     "node": "12.x"
   },
   "scripts": {
-    "build": "vue-cli-service build && node server",
-    "lint": "vue-cli-service lint"
+    "build": "vue-cli-service build",
+    "lint": "node server"
   },
   "dependencies": {
     "core-js": "^3.6.5",
