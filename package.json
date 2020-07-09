@@ -5,9 +5,9 @@
   "engines": {
     "node": "12.x"
   },
-  "main": "server.js",
   "scripts": {
-    "start": "node --harmony server"
+    "build": "vue-cli-service build && node server",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.6.5",
