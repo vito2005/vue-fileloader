@@ -58,6 +58,4 @@ app.post('/api/upload', (request, response) => {
 app.use(express.static(path.join(__dirname, '/dist/')))
 app.get('/.*/', (req, res) => res.sendFile(path.join(__dirname, '/dist/index.html')))
 
-app.listen(3000, () => {
-  console.log('Server started on port 3000')
-})
+app.listen(3000)
