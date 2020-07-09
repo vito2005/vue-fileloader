@@ -6,9 +6,7 @@
     "node": "12.x"
   },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "start": "node server",
-    "lint": "vue-cli-service lint"
+    "start": "node server"
   },
   "dependencies": {
     "core-js": "^3.6.5",
